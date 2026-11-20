@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sorting Visualizer - DAA Project</title>
+<style>
+body{font-family:Arial;text-align:center;background:#f0f0f0}
+h1{color:#333}
+button{padding:10px 15px;margin:5px;border:none;border-radius:5px;background:#4CAF50;color:white;cursor:pointer}
+button:hover{background:#45a049}
+#bars{display:flex;align-items:flex-end;justify-content:center;height:300px;margin:20px;background:white;border:1px solid #ddd;padding:10px}
+.bar{background:#2196F3;margin:0 2px;width:30px}
+</style>
+</head>
+<body>
+<h1>Sorting Visualizer</h1>
+<p>DAA Project | Bubble, Selection, Merge & Quick Sort</p>
+
+<button onclick="newArray()">New Array</button>
+<button onclick="bubbleSort()">Bubble Sort</button>
+<button onclick="selectionSort()">Selection Sort</button>
+<button onclick="quickSortStart()">Quick Sort</button>
+
+<label>Speed: <input type="range" id="speed" min="10" max="500" value="100"></label>
+
+<div id="bars"></div>
+<p id="status">Click New Array to start</p>
+
+<script>
+let arr = [];
+let barsDiv = document.getElementById("bars");
+
+function newArray(){
+  arr = [];
+  for(let i=0;i<20;i++) arr.push(Math.floor(Math.random()*250)+20);
+  draw();
+  document.getElementById("status").innerText = "New Array Generated - Ready to Sort";
+}
+
+function draw(){
+  barsDiv.innerHTML = "";
+  arr.forEach(val=>{
+    let div = document.createElement("div");
+    div.className = "bar";
+    div.style.height = val+"px";
+    barsDiv.appendChild(div);
+  });
+}
+
+function sleep(){
+  let s = document.getElementById("speed").value;
+  return new Promise(r=>setTimeout(r, 520 - s));
+}
+
+async function bubbleSort(){
+  document.getElementById("status").innerText = "Bubble Sorting... O(n^2)";
+  for(let i=0;i<arr.length;i++){
+    for(let j=0;j<arr.length-i-1;j++){
+      if(arr[j] > arr[j+1]){
+        [arr[j], arr[j+1]] = [arr[j+1], arr[j]];
+        draw(); await sleep();
+      }
+    }
+  }
+  document.getElementById("status").innerText = "Bubble Sort Done!";
+}
+
+async function selectionSort(){
+  document.getElementById("status").innerText = "Selection Sorting... O(n^2)";
+  for(let i=0;i<arr.length;i++){
+    let min = i;
+    for(let j=i+1;j<arr.length;j++) if(arr[j]<arr[min]) min=j;
+    [arr[i], arr[min]] = [arr[min], arr[i]];
+    draw(); await sleep();
+  }
+  document.getElementById("status").innerText = "Selection Sort Done!";
+}
+
+async function quickSortStart(){
+  document.getElementById("status").innerText = "Quick Sorting... O(n log n)";
+  await quick(0, arr.length-1);
+  document.getElementById("status").innerText = "Quick Sort Done!";
+}
+
+async function quick(l, h){
+  if(l>=h) return;
+  let p = arr[h], i=l-1;
+  for(let j=l;j<h;j++){
+    if(arr[j]<p){ i++; [arr[i],arr[j]]=[arr[j],arr[i]]; draw(); await sleep(); }
+  }
+  [arr[i+1],arr[h]]=[arr[h],arr[i+1]]; draw(); await sleep();
+  await quick(l,i); await quick(i+2,h);
+}
+
+newArray();
+</script>
+</body>
+</html>
